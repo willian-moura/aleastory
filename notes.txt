@@ -1,0 +1,31 @@
+ws = new WebSocket('ws://192.168.0.6:3333/game');
+
+useEffect(() => {
+        ws.onopen = () => {
+            console.log('WebSocket Client Connected');
+
+            const packet = {
+                type : 'init-info',
+                data : {
+                    player : {
+                        username : 'teste',
+                        playerlevel : 2
+                    }
+                }
+            }
+
+            ws.send(JSON.stringify(packet))
+        };
+        ws.onclose = () => {
+            console.log('WebSocket Client Disconnected');
+        }
+        ws.onmessage = (message) => {
+            
+            const packet = JSON.parse(message.data)
+
+            if (packet.type != 'update-stageclock' && packet.type != 'update-duration'){
+                console.log(packet)
+            }
+
+        };
+    }, [])
