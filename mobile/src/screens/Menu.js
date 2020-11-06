@@ -1,15 +1,18 @@
 import React, {useEffect, useState} from 'react';
 import { View, StyleSheet, StatusBar} from 'react-native'
+import { useNavigation } from '@react-navigation/native'
 import { useSelector } from 'react-redux'
 
 import Button from '../components/button'
 import Logo from '../components/logo'
 
 export default function Menu(){
+    const navigation = useNavigation();
+
     const [user, setUser] = useState(useSelector(state => state.user))
 
     const handlePlay = () => {
-
+        navigation.navigate('Jogar')
     }
 
     const handleStatistics = () => {
