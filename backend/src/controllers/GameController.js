@@ -2,11 +2,10 @@ const express = require('express')
 const createGame = require('../game/game.js')
 
 const wsHelper = require('../utils/socketHelper')
-
-WebSocketServer = require("ws").Server
+const WebSocket = require("ws")
 
 module.exports = function (server) {
-    const sockets = new WebSocketServer({server, path: '/game'});
+    const sockets = new WebSocket.Server({server, path: '/game'});
 
     const game = createGame()
     game.start()
@@ -15,7 +14,7 @@ module.exports = function (server) {
 
         game.subscribe((command) => {
             if (command.type != 'update-stageclock' && command.type != 'update-duration'){
-                console.log(`> Emitting ${command.type}`)
+                // console.log(`> Emitting ${command.type}`)
             }
             socket.send(JSON.stringify(command))
         })
@@ -24,8 +23,6 @@ module.exports = function (server) {
             username: 'guess',
             playerlevel: 0,
         };
-
-        socket.send(wsHelper.encoderPacket('setup', game.state))
 
         socket.on('message', (message) => {
             
@@ -41,6 +38,8 @@ module.exports = function (server) {
                     player: player.username,
                     playerLevel: player.playerlevel,
                 });
+
+                socket.send(wsHelper.encoderPacket('setup', game.state))
             }
 
             // submit-word
@@ -95,10 +94,17 @@ module.exports = function (server) {
 
         });
 
-        socket.on('disconnect', () => {
+        // socket.on('disconnect', () => {
+        //     game.removePlayer({ player: player.username });
+        //     console.log(`> Player disconnected: ${player.username}`);
+        // });
+
+        socket.on( 'close' ,() => {
             game.removePlayer({ player: player.username });
             console.log(`> Player disconnected: ${player.username}`);
-        });
+        })
 
     })
+
+    
 }

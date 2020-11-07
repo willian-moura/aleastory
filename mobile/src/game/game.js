@@ -3,7 +3,7 @@ module.exports = function createGame(){
         players : {}, //players in the match
         submittedWords : [], //submitted words 'til the moment
         currentRound : 1, //current round
-        gameDuration : 1500, //match duration in seconds
+        gameDuration : 300, //match duration in seconds
         stage : 0, //stage 0: match doesn't start | stage 1: word submission | stage 2: vote stage
         currentText : '', //current text (story) thet players are creating
         lastBestWord : {word: '- ', player: null, votes: 0 }, //store the last best voted word by the players
@@ -45,7 +45,8 @@ module.exports = function createGame(){
 
         notifyAll({
             type: 'add-player',
-            players: state.players,
+            player: playerName,
+            playerLevel: playerLevel,
         })
 
     }
@@ -57,7 +58,7 @@ module.exports = function createGame(){
 
         notifyAll({
             type: 'remove-player',
-            players: state.players,
+            player: playerName,
         })
 
     }
@@ -207,7 +208,6 @@ module.exports = function createGame(){
                             player: wordPlayer != null ? wordPlayer : null, 
                             score: wordPlayer != null ? state.players[wordPlayer].score : null 
                         },
-                        players: state.players
                     });
                     
                 }
