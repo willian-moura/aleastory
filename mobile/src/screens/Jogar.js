@@ -4,6 +4,10 @@ import { useSelector } from "react-redux";
 
 import Button from "../components/button";
 import Input from "../components/inputText";
+import InputTextButton from "../components/inputTextButton";
+import Card from "../components/card";
+import Stages from "../components/stages";
+import CardHeader from "../components/cardHeader";
 import Logo from "../components/logo";
 
 const STAGE_NAME = ["Aguardando", "1a Etapa", "2a Etapa"];
@@ -76,7 +80,7 @@ export default function Jogar() {
   };
 
   useEffect(() => {
-    socketRef.current = new WebSocket("ws://192.168.0.6:3333/game");
+    socketRef.current = new WebSocket("ws://192.168.0.7:3333/game");
     const ws = socketRef.current;
     ws.onopen = () => {
       console.log("WebSocket Client Connected");
@@ -189,7 +193,7 @@ export default function Jogar() {
     <View style={styles.view}>
       <StatusBar hidden={true} />
 
-      <View style={styles.logo}>
+      {/* <View style={styles.logo}>
         <Logo />
       </View>
 
@@ -224,18 +228,22 @@ export default function Jogar() {
               )
           )}
         </View>
-      )}
+      )} */}
 
-      <Text>Texto: {currentText}</Text>
+      <CardHeader user={user} players={players} />
 
+      <Stages counter={stageClock} stage={stage} />
+
+      <Card text={currentText} />
       {stage == 1 && !sended && (
         <View>
-          <Input
+          <InputTextButton
             value={wordToSend}
             onChangeText={setWordToSend}
             placeholder="Digite algo..."
+            button="Enviar"
+            onButtonPress={() => handleSubmitWord(wordToSend)}
           />
-          <Button title="Enviar" onPress={() => handleSubmitWord(wordToSend)} />
         </View>
       )}
     </View>

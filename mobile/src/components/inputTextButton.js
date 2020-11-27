@@ -20,11 +20,13 @@ const Input = (props) => {
         borderBottomWidth: 1,
         borderBottomColor: "#FFF",
         margin: props.margin,
+        paddingBottom: 10,
         width: props.width,
       }}
     >
       <View
         style={{
+          position: "absolute",
           alignItems: "flex-start",
           width: props.width * 0.8,
           height: props.height,
@@ -73,7 +75,7 @@ Input.defaultProps = {
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: "#FFF9",
+    backgroundColor: "#FFF5",
     borderRadius: 45,
     width: 0.2 * deviceWidth,
   },
