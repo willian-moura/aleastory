@@ -8,6 +8,8 @@ import InputTextButton from "../components/inputTextButton";
 import Card from "../components/card";
 import Stages from "../components/stages";
 import CardHeader from "../components/cardHeader";
+import VoteWord from "../components/voteWord";
+import MostVotedWord from "../components/mostVotedWord";
 import Logo from "../components/logo";
 
 const STAGE_NAME = ["Aguardando", "1a Etapa", "2a Etapa"];
@@ -62,23 +64,6 @@ export default function Jogar() {
     }
   };
 
-  const handleVoteWord = (obj) => {
-    const ws = socketRef.current;
-    if (obj.player != user.username) {
-      setVoted(true);
-      const packet = {
-        type: "vote-word",
-        data: {
-          word: obj.word,
-          player: user.username,
-        },
-      };
-      ws.send(JSON.stringify(packet));
-    } else {
-      console.log("You can't vote on your own word!");
-    }
-  };
-
   useEffect(() => {
     socketRef.current = new WebSocket("ws://192.168.0.7:3333/game");
     const ws = socketRef.current;
@@ -90,7 +75,7 @@ export default function Jogar() {
         data: {
           player: {
             username: user.username,
-            playerlevel: user.userlevel,
+            playerlevel: user.level,
           },
         },
       };
@@ -235,6 +220,7 @@ export default function Jogar() {
       <Stages counter={stageClock} stage={stage} />
 
       <Card text={currentText} />
+
       {stage == 1 && !sended && (
         <View>
           <InputTextButton
@@ -246,6 +232,19 @@ export default function Jogar() {
           />
         </View>
       )}
+
+      {!voted && (
+        <VoteWord
+          user={user}
+          submittedWords={submittedWords}
+          stage={stage}
+          voted={voted}
+          setVoted={setVoted}
+          ws={socketRef.current}
+        />
+      )}
+
+      <MostVotedWord stage={stage} lastBestWord={lastBestWord} />
     </View>
   );
 }

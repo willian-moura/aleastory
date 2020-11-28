@@ -183,7 +183,9 @@ module.exports = function createGame() {
           state.currentText +=
             state.lastBestWord.word != "" ? `${state.lastBestWord.word} ` : "";
           const wordPlayer = state.lastBestWord.player;
-          if (wordPlayer != null) state.players[wordPlayer].score += 100;
+          if (wordPlayer != null && state.players[wordPlayer]) {
+            state.players[wordPlayer].score += 100;
+          }
           console.log(state.players[wordPlayer]);
           state.stage = 0;
           state.stageClock = 5;
@@ -201,6 +203,7 @@ module.exports = function createGame() {
             words: state.submittedWords,
             status: state.status,
             round: state.currentRound,
+            lastBestWord: state.lastBestWord,
             bestWordPlayer: {
               player: wordPlayer != null ? wordPlayer : null,
               score:
