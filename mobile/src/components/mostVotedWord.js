@@ -15,6 +15,7 @@ var deviceWidth = Dimensions.get("window").width;
 const MostVotedWord = (props) => {
   return (
     props.stage === 0 &&
+    !!props.lastBestWord &&
     !!props.lastBestWord.word && (
       <View style={styles.container}>
         <Text style={styles.title}>A palavra mais votada foi:</Text>

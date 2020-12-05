@@ -12,6 +12,8 @@ import VoteWord from "../components/voteWord";
 import MostVotedWord from "../components/mostVotedWord";
 import Logo from "../components/logo";
 import PlayersList from "../components/playersList";
+import GameOver from "../components/gameOver";
+import Starting from "../components/starting";
 
 const STAGE_NAME = ["Aguardando", "1a Etapa", "2a Etapa"];
 
@@ -29,11 +31,15 @@ export default function Jogar() {
   const [status, setStatus] = useState("");
   const [stageDuration, setStageDuration] = useState(0);
   const [stageClock, setStageClock] = useState(0);
+  const [finalClock, setFinalClock] = useState(0);
+  const [winner, setWinner] = useState(null);
 
   const [wordToSend, setWordToSend] = useState("");
   const [sended, setSended] = useState(false);
   const [voted, setVoted] = useState(false);
   const [playersList, setPlayersList] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
+  const [starting, setStarting] = useState(false);
 
   const setState = (state) => {
     setPlayers(state["players"]);
@@ -64,6 +70,14 @@ export default function Jogar() {
     } else {
       console.log("Empty word!");
     }
+  };
+
+  const handleWordToSend = (value) => {
+    let word = value;
+    if (/\s/.test(value)) {
+      word = value.split(" ")[0];
+    }
+    setWordToSend(word);
   };
 
   useEffect(() => {
@@ -143,6 +157,7 @@ export default function Jogar() {
 
       if (packet.type == "waiting-stage") {
         console.log(`Receiving ${packet.type}`);
+        setStarting(false);
         setStage(packet.stage);
         setStageClock(packet.stageClock);
         setCurrentText(packet.text);
@@ -164,6 +179,23 @@ export default function Jogar() {
         setPlayers(packet.players);
       }
 
+      if (packet.type == "game-over") {
+        console.log(packet);
+        setGameOver(true);
+        setFinalClock(packet.finalClock);
+        setPlayers(packet.players);
+        setCurrentText(packet.currentText);
+        setWinner(packet.winnerPlayer);
+      }
+
+      if (packet.type == "starting") {
+        console.log(`starting`);
+        setGameOver(false);
+        setStarting(true);
+        setWinner(null);
+        setFinalClock(packet.finalClock);
+      }
+
       if (packet.type == "err") {
         console.log(`[ERROR] ${packet.data}`);
       }
@@ -175,43 +207,6 @@ export default function Jogar() {
   return (
     <View style={styles.view}>
       <StatusBar hidden={true} />
-
-      {/* <View style={styles.logo}>
-        <Logo />
-      </View>
-
-      <Text>Duração: {gameDuration}</Text>
-
-      <Text>Round: {currentRound}</Text>
-
-      <Text>{STAGE_NAME[stage]}</Text>
-
-      <Text>{stageClock}</Text>
-
-      <Text>{status}</Text>
-
-      <Text>Players: </Text>
-      {Object.keys(players).map((player, index) => (
-        <Text key={player}>
-          {player} - {players[player].score}
-        </Text>
-      ))}
-
-      {stage == 2 && !voted && (
-        <View>
-          <Text>Palavras submetidas: </Text>
-          {submittedWords.map(
-            (obj, index) =>
-              obj.player != user.username && (
-                <Button
-                  key={index}
-                  title={obj.word}
-                  onPress={() => handleVoteWord(obj)}
-                />
-              )
-          )}
-        </View>
-      )} */}
 
       <CardHeader
         user={user}
@@ -227,7 +222,7 @@ export default function Jogar() {
         <View>
           <InputTextButton
             value={wordToSend}
-            onChangeText={setWordToSend}
+            onChangeText={handleWordToSend}
             placeholder="Digite algo..."
             button="Enviar"
             onButtonPress={() => handleSubmitWord(wordToSend)}
@@ -254,6 +249,10 @@ export default function Jogar() {
         setPlayersList={setPlayersList}
         gameDuration={gameDuration}
       />
+
+      <GameOver player={winner} gameOver={gameOver} finalText={currentText} />
+
+      <Starting starting={starting} finalClock={finalClock} />
     </View>
   );
 }

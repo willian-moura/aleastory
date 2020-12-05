@@ -1,14 +1,17 @@
 module.exports = function createGame() {
+  const GAME_DURATION = 45;
+
   const state = {
     players: {}, //players in the match
     submittedWords: [], //submitted words 'til the moment
     currentRound: 1, //current round
-    gameDuration: 1500, //match duration in seconds
+    gameDuration: GAME_DURATION, //match duration in seconds
     stage: 0, //stage 0: match doesn't start | stage 1: word submission | stage 2: vote stage
     currentText: "", //current text (story) thet players are creating
     lastBestWord: { word: "- ", player: null, votes: 0 }, //store the last best voted word by the players
     status: "Waiting...",
     stageDuration: 15,
+    finalClock: 30,
     stageClock: 5, //current stage clock
   };
 
@@ -37,6 +40,7 @@ module.exports = function createGame() {
     const playerName = command.player;
     const playerLevel = command.playerLevel;
     state.players[playerName] = {
+      username: playerName,
       score: 0,
       level: playerLevel,
       voted: false,
@@ -72,6 +76,14 @@ module.exports = function createGame() {
     oldPlayers.forEach((player, index) => {
       player[1].matchRank = index + 1;
       state.players[player[0]] = player[1];
+    });
+  }
+
+  function resetScores() {
+    Object.keys(state.players).forEach((key) => {
+      if (state.players[key]) {
+        state.players[key].score = 0;
+      }
     });
   }
 
@@ -240,11 +252,49 @@ module.exports = function createGame() {
         duration: state.gameDuration,
       });
     } else {
-      state.status = "Game over!";
-      console.log(state.status);
-      notifyAll({
-        type: "game-over",
-      });
+      if (state.finalClock > 5) {
+        state.finalClock -= 1;
+        state.status = "Game over!";
+        console.log(state.status);
+        notifyAll({
+          type: "game-over",
+          finalClock: state.finalClock,
+          currentText: state.currentText,
+          players: state.players,
+          winnerPlayer: Object.entries(state.players)[0]
+            ? Object.entries(state.players)[0][1]
+            : null,
+        });
+      } else if (state.finalClock > 0) {
+        if (state.finalClock === 5) {
+          resetScores();
+        }
+        state.finalClock -= 1;
+        notifyAll({
+          type: "starting",
+          finalClock: state.finalClock,
+        });
+      } else {
+        state.gameDuration = GAME_DURATION;
+        state.finalClock = 30;
+        state.stage = 0;
+        state.stageClock = 5;
+        state.currentText = "";
+        state.submittedWords = [];
+        state.status = "Waiting...";
+        state.lastBestWord = {};
+        state.currentRound = 0;
+        notifyAll({
+          type: "waiting-stage",
+          stage: state.stage,
+          stageClock: state.stageClock,
+          text: state.currentText,
+          words: state.submittedWords,
+          status: state.status,
+          round: state.currentRound,
+          players: state.players,
+        });
+      }
     }
   }
 
