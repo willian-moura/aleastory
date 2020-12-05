@@ -1,24 +1,42 @@
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Dimensions, StyleSheet, Text } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 var deviceHeight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
 
 const CardHeader = (props) => {
+  const [players, setPlayers] = useState(props.players);
+  const [user, setUser] = useState(props.user);
+
+  useEffect(() => {
+    setPlayers(props.players);
+    setUser(props.user);
+  }, [props]);
+
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.username}>{props.user.username}</Text>
-        <Text style={styles.score}>0 pontos</Text>
-        <View style={styles.levelContainer}>
-          <View style={styles.level}>
-            <Text style={styles.levelText}>{props.user.level}</Text>
+    <View style={styles.global}>
+      <View style={styles.container}>
+        <TouchableOpacity onPress={() => props.setPlayersList(true)}>
+          <View style={styles.card}>
+            <Text style={styles.username}>{user.username}</Text>
+            <Text style={styles.score}>
+              {players[user.username] && players[user.username].score}
+            </Text>
+            <View style={styles.levelContainer}>
+              <View style={styles.level}>
+                <Text style={styles.levelText}>{user.level}</Text>
+              </View>
+            </View>
           </View>
-        </View>
-      </View>
-      <View style={styles.positionContainer}>
-        <View style={styles.position}>
-          <Text style={styles.positionText}>1º</Text>
+        </TouchableOpacity>
+
+        <View style={styles.positionContainer}>
+          <View style={styles.position}>
+            <Text style={styles.positionText}>
+              {players[user.username] && players[user.username].matchRank}º
+            </Text>
+          </View>
         </View>
       </View>
     </View>
@@ -34,6 +52,12 @@ CardHeader.defaultProps = {
 };
 
 const styles = StyleSheet.create({
+  global: {
+    marginTop: 10,
+    minWidth: 0.8 * deviceWidth,
+    minHeight: 0.06 * deviceHeight,
+    alignItems: "center",
+  },
   container: {
     marginTop: 10,
     minWidth: 0.8 * deviceWidth,

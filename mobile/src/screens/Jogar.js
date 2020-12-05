@@ -11,6 +11,7 @@ import CardHeader from "../components/cardHeader";
 import VoteWord from "../components/voteWord";
 import MostVotedWord from "../components/mostVotedWord";
 import Logo from "../components/logo";
+import PlayersList from "../components/playersList";
 
 const STAGE_NAME = ["Aguardando", "1a Etapa", "2a Etapa"];
 
@@ -32,6 +33,7 @@ export default function Jogar() {
   const [wordToSend, setWordToSend] = useState("");
   const [sended, setSended] = useState(false);
   const [voted, setVoted] = useState(false);
+  const [playersList, setPlayersList] = useState(false);
 
   const setState = (state) => {
     setPlayers(state["players"]);
@@ -65,7 +67,7 @@ export default function Jogar() {
   };
 
   useEffect(() => {
-    socketRef.current = new WebSocket("ws://192.168.0.7:3333/game");
+    socketRef.current = new WebSocket("ws://192.168.0.6:3333/game");
     const ws = socketRef.current;
     ws.onopen = () => {
       console.log("WebSocket Client Connected");
@@ -126,6 +128,7 @@ export default function Jogar() {
         setStage(packet.stage);
         setStageClock(packet.stageClock);
         setStatus(packet.status);
+        setPlayers(packet.players);
       }
 
       if (packet.type == "vote-stage") {
@@ -135,6 +138,7 @@ export default function Jogar() {
         setStageClock(packet.stageClock);
         setSubmittedWords(packet.words);
         setStatus(packet.status);
+        setPlayers(packet.players);
       }
 
       if (packet.type == "waiting-stage") {
@@ -146,13 +150,7 @@ export default function Jogar() {
         setSubmittedWords(packet.words);
         // (limpar lista de palavras)
         setLastBestWord(packet.lastBestWord);
-
-        const bestWordPlayer = packet.bestWordPlayer;
-        if (bestWordPlayer.player != null) {
-          setPlayers(packet.players);
-        } else {
-          console.log("bestWordPlayer is NULL");
-        }
+        setPlayers(packet.players);
         setStatus(packet.status);
       }
 
@@ -215,7 +213,11 @@ export default function Jogar() {
         </View>
       )} */}
 
-      <CardHeader user={user} players={players} />
+      <CardHeader
+        user={user}
+        players={players}
+        setPlayersList={setPlayersList}
+      />
 
       <Stages counter={stageClock} stage={stage} />
 
@@ -245,6 +247,13 @@ export default function Jogar() {
       )}
 
       <MostVotedWord stage={stage} lastBestWord={lastBestWord} />
+
+      <PlayersList
+        players={players}
+        playersList={playersList}
+        setPlayersList={setPlayersList}
+        gameDuration={gameDuration}
+      />
     </View>
   );
 }

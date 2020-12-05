@@ -41,6 +41,7 @@ module.exports = function createGame() {
       level: playerLevel,
       voted: false,
       submitted: false,
+      matchRank: 0,
     };
 
     notifyAll({
@@ -60,6 +61,20 @@ module.exports = function createGame() {
     });
   }
 
+  function sortPlayers() {
+    let oldPlayers = state.players;
+    oldPlayers = Object.entries(oldPlayers).sort(
+      (a, b) => b[1].score - a[1].score
+    );
+
+    state.players = {};
+
+    oldPlayers.forEach((player, index) => {
+      player[1].matchRank = index + 1;
+      state.players[player[0]] = player[1];
+    });
+  }
+
   function submitWord(command) {
     const word = command.word;
     const player = command.player;
@@ -71,6 +86,7 @@ module.exports = function createGame() {
       state.submittedWords.push({ word: word, player: player, votes: 0 });
       state.players[player].submitted = true;
       state.players[player].score += 10;
+      sortPlayers();
       notifyAll({
         type: "submitted-word",
         player: player,
@@ -101,6 +117,7 @@ module.exports = function createGame() {
       word.votes += 1;
       state.players[player].voted = true;
       state.players[player].score += 20;
+      sortPlayers();
       notifyAll({
         type: "player-voted",
         player: player,
@@ -150,6 +167,7 @@ module.exports = function createGame() {
             stage: state.stage,
             stageClock: state.stageClock,
             status: state.status,
+            players: state.players,
           });
         }
       } else if (state.stage === 1) {
@@ -169,6 +187,7 @@ module.exports = function createGame() {
             stageClock: state.stageClock,
             words: state.submittedWords,
             status: state.status,
+            players: state.players,
           });
         }
       } else if (state.stage === 2) {
@@ -189,12 +208,13 @@ module.exports = function createGame() {
           console.log(state.players[wordPlayer]);
           state.stage = 0;
           state.stageClock = 5;
-          console.log(state);
           state.submittedWords = [];
           state.currentRound += 1;
           for (const p in state.players) state.players[p].voted = false;
           for (const p in state.players) state.players[p].submitted = false;
           state.status = "Waiting...";
+          sortPlayers();
+          console.log(state);
           notifyAll({
             type: "waiting-stage",
             stage: state.stage,
