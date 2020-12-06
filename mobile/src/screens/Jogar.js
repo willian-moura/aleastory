@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Text, View, StyleSheet, StatusBar } from "react-native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 import Button from "../components/button";
 import Input from "../components/inputText";
@@ -14,10 +14,13 @@ import Logo from "../components/logo";
 import PlayersList from "../components/playersList";
 import GameOver from "../components/gameOver";
 import Starting from "../components/starting";
+import api from "../services/api";
+import { setUser as setUserReducer } from "../redux/reducer";
 
 const STAGE_NAME = ["Aguardando", "1a Etapa", "2a Etapa"];
 
 export default function Jogar() {
+  const dispatch = useDispatch();
   const socketRef = useRef({});
   const [user, setUser] = useState(useSelector((state) => state.user));
 
@@ -80,9 +83,22 @@ export default function Jogar() {
     setWordToSend(word);
   };
 
+  const handleUser = () => {
+    api
+      .get(`/users/${user.id}`)
+      .then((resp) => {
+        console.log(resp.data);
+        dispatch(setUserReducer(resp.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   useEffect(() => {
     socketRef.current = new WebSocket("ws://192.168.0.6:3333/game");
     const ws = socketRef.current;
+    handleUser();
     ws.onopen = () => {
       console.log("WebSocket Client Connected");
 
@@ -110,21 +126,21 @@ export default function Jogar() {
         packet.type != "update-stageclock" &&
         packet.type != "update-duration"
       ) {
-        console.log(packet);
+        // console.log(packet);
       }
 
       if (packet.type == "setup") {
-        console.log(`Receiving ${packet.type}`);
+        // console.log(`Receiving ${packet.type}`);
         setState(packet.data);
       }
 
       if (packet.type == "add-player") {
-        console.log(`Receiving ${packet.type}`);
+        // console.log(`Receiving ${packet.type}`);
         setPlayers(packet.players);
       }
 
       if (packet.type == "remove-player") {
-        console.log(`Receiving ${packet.type}`);
+        // console.log(`Receiving ${packet.type}`);
         setPlayers(packet.players);
       }
 
@@ -138,7 +154,7 @@ export default function Jogar() {
 
       if (packet.type == "submit-stage") {
         setSended(false);
-        console.log(`Receiving ${packet.type}`);
+        // console.log(`Receiving ${packet.type}`);
         setStage(packet.stage);
         setStageClock(packet.stageClock);
         setStatus(packet.status);
@@ -147,7 +163,7 @@ export default function Jogar() {
 
       if (packet.type == "vote-stage") {
         setVoted(false);
-        console.log(`Receiving ${packet.type}`);
+        // console.log(`Receiving ${packet.type}`);
         setStage(packet.stage);
         setStageClock(packet.stageClock);
         setSubmittedWords(packet.words);
@@ -156,7 +172,7 @@ export default function Jogar() {
       }
 
       if (packet.type == "waiting-stage") {
-        console.log(`Receiving ${packet.type}`);
+        // console.log(`Receiving ${packet.type}`);
         setStarting(false);
         setStage(packet.stage);
         setStageClock(packet.stageClock);
@@ -180,7 +196,7 @@ export default function Jogar() {
       }
 
       if (packet.type == "game-over") {
-        console.log(packet);
+        // console.log(packet);
         setGameOver(true);
         setFinalClock(packet.finalClock);
         setPlayers(packet.players);
@@ -189,7 +205,7 @@ export default function Jogar() {
       }
 
       if (packet.type == "starting") {
-        console.log(`starting`);
+        // console.log(`starting`);
         setGameOver(false);
         setStarting(true);
         setWinner(null);

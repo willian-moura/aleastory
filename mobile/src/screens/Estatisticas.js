@@ -11,12 +11,12 @@ export default function Menu() {
 
   const [user, setUser] = useState(useSelector((state) => state.user));
 
-  const handlePlay = () => {
-    navigation.navigate("Jogar");
+  const handleMyStatistics = () => {
+    navigation.navigate("MinhasEstatisticas");
   };
 
-  const handleStatistics = () => {
-    navigation.navigate("Estatisticas");
+  const handleGlobalRanking = () => {
+    navigation.navigate("RankingGlobal");
   };
 
   return (
@@ -29,11 +29,11 @@ export default function Menu() {
 
       <View style={styles.buttons}>
         <View style={styles.button}>
-          <Button title="Jogar" onPress={handlePlay} />
+          <Button title="Estatísticas" onPress={handleMyStatistics} />
         </View>
 
         <View style={styles.button}>
-          <Button title="Estatísticas" onPress={handleStatistics} />
+          <Button title="Ranking Global" onPress={handleGlobalRanking} />
         </View>
       </View>
     </View>

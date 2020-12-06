@@ -1,3 +1,5 @@
+const connection = require("../database/connection");
+
 module.exports = function createGame() {
   const GAME_DURATION = 45;
 
@@ -85,6 +87,30 @@ module.exports = function createGame() {
         state.players[key].score = 0;
       }
     });
+  }
+
+  async function saveStatistics() {
+    let players = Object.entries(state.players);
+    let winner = players[0][1];
+    console.log(winner);
+    players.forEach(async (item, index) => {
+      let sql = ` UPDATE users 
+                  SET matches_played = matches_played + 1,
+                      bigger_score =  CASE 
+                                        WHEN bigger_score < ${winner.score}
+                                          THEN  ${winner.score}
+                                        ELSE
+                                          bigger_score
+                                      END
+                  WHERE username = '${item[0]}'`;
+      await connection.raw(sql);
+      // console.log(sql);
+    });
+    if (winner) {
+      let sql = `UPDATE users SET wins = wins + 1 WHERE username = '${winner.username}'`;
+      await connection.raw(sql);
+      // console.log(sql);
+    }
   }
 
   function submitWord(command) {
@@ -267,6 +293,7 @@ module.exports = function createGame() {
         });
       } else if (state.finalClock > 0) {
         if (state.finalClock === 5) {
+          saveStatistics();
           resetScores();
         }
         state.finalClock -= 1;
