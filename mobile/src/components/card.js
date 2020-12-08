@@ -6,8 +6,15 @@ var deviceWidth = Dimensions.get("window").width;
 
 const Card = (props) => {
   return (
-    <View style={styles.container}>
-      <Text>{props.text}</Text>
+    <View
+      style={[
+        styles.container,
+        props.style,
+        { backgroundColor: props.backgroundColor || "#BAE8E8" },
+      ]}
+    >
+      {!!props.text && <Text>{props.text}</Text>}
+      {props.children}
     </View>
   );
 };
@@ -22,7 +29,6 @@ Card.defaultProps = {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#BAE8E8",
     borderRadius: 10,
     padding: 10,
     minWidth: 0.8 * deviceWidth,

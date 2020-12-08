@@ -1,7 +1,7 @@
 const connection = require("../database/connection");
 
 module.exports = function createGame() {
-  const GAME_DURATION = 45;
+  const GAME_DURATION = 600;
 
   const state = {
     players: {}, //players in the match
