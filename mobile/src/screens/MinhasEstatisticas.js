@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 
 import Card from "../components/card";
+import LevelBar from "../components/levelBar";
 
 var deviceHeight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
@@ -42,7 +43,7 @@ export default function MinhasEstatisticas() {
         </View>
         <Text style={styles.cardHeaderText}>{user.username}</Text>
         <Text style={styles.subtitleLabel}>Número de vitórias</Text>
-        <Text style={styles.subtitleValue}>{user.wins}</Text>
+        <LevelBar wins={user.wins} level={user.level} />
         <Text style={styles.subtitleLabel}>Maior pontuação atingida</Text>
         <Text style={styles.subtitleValue}>{user.bigger_score}</Text>
         <Text style={styles.subtitleLabel}>Partidas jogadas</Text>

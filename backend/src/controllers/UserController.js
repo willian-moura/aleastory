@@ -73,7 +73,7 @@ module.exports = {
       user[0].level = 3;
     } else if (user[0].wins < 50) {
       user[0].level = 4;
-    } else if (user[0].wins < 80) {
+    } else {
       user[0].level = 5;
     }
 
@@ -108,7 +108,7 @@ module.exports = {
       user[0].level = 3;
     } else if (user[0].wins < 50) {
       user[0].level = 4;
-    } else if (user[0].wins < 80) {
+    } else {
       user[0].level = 5;
     }
 
