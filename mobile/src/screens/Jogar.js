@@ -16,6 +16,7 @@ import GameOver from "../components/gameOver";
 import Starting from "../components/starting";
 import api from "../services/api";
 import { setUser as setUserReducer } from "../redux/reducer";
+import config from "../config";
 
 const STAGE_NAME = ["Aguardando", "1a Etapa", "2a Etapa"];
 
@@ -96,7 +97,7 @@ export default function Jogar() {
   };
 
   useEffect(() => {
-    socketRef.current = new WebSocket("ws://192.168.0.6:3333/game");
+    socketRef.current = new WebSocket(`ws://${config.API_URL}/game`);
     const ws = socketRef.current;
     handleUser();
     ws.onopen = () => {
