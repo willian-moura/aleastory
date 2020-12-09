@@ -97,7 +97,7 @@ export default function Jogar() {
   };
 
   useEffect(() => {
-    socketRef.current = new WebSocket(`ws://${config.API_URL}/game`);
+    socketRef.current = new WebSocket(`${config.API_URL}/game`);
     const ws = socketRef.current;
     handleUser();
     ws.onopen = () => {
