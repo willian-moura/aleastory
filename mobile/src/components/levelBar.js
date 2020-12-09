@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, StatusBar, Dimensions, Text } from "react-native";
 
-const LEVEL_WINS_REQUIRED = [0, 1, 5, 10, 25, 50];
+const LEVEL_WINS_REQUIRED = [0, 1, 5, 10, 25, 50, 500];
 
 var deviceHeight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
 
 export default function LevelBar(props) {
   const totalWidth = 0.7 * deviceWidth;
-  const barWidth = props.wins / LEVEL_WINS_REQUIRED[props.level + 1];
+  const barWidth = LEVEL_WINS_REQUIRED[props.level + 1]
+    ? props.wins / LEVEL_WINS_REQUIRED[props.level + 1]
+    : 0;
 
   return (
     <View style={styles.container(totalWidth, barWidth)}>
